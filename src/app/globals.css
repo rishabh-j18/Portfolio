@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 232 43% 11%;
+    --foreground: 220 20% 96%;
+    --card: 230 30% 15%;
+    --card-foreground: 220 20% 96%;
+    --popover: 232 43% 11%;
+    --popover-foreground: 220 20% 96%;
+    --primary: 219 80% 65%;
+    --primary-foreground: 232 43% 11%;
+    --secondary: 227 25% 25%;
+    --secondary-foreground: 220 20% 96%;
+    --muted: 227 25% 25%;
+    --muted-foreground: 220 15% 65%;
+    --accent: 300 81% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 227 25% 25%;
+    --input: 227 25% 25%;
+    --ring: 300 81% 60%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 232 43% 11%;
+    --foreground: 220 20% 96%;
+    --card: 230 30% 15%;
+    --card-foreground: 220 20% 96%;
+    --popover: 232 43% 11%;
+    --popover-foreground: 220 20% 96%;
+    --primary: 219 80% 65%;
+    --primary-foreground: 232 43% 11%;
+    --secondary: 227 25% 25%;
+    --secondary-foreground: 220 20% 96%;
+    --muted: 227 25% 25%;
+    --muted-foreground: 220 15% 65%;
+    --accent: 300 81% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 227 25% 25%;
+    --input: 227 25% 25%;
+    --ring: 300 81% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@keyframes float {
+	0% {
+		transform: translatey(0px);
+	}
+	50% {
+		transform: translatey(-20px);
+	}
+	100% {
+		transform: translatey(0px);
+	}
+}
+
+@keyframes ShootingStar {
+  0% {
+    transform: translateX(100vw) translateY(-10vh) rotate(-45deg);
+    opacity: 1;
+    height: 2px;
+  }
+  100% {
+    transform: translateX(-10vw) translateY(100vh) rotate(-45deg);
+    opacity: 0;
+    height: 10px;
+  }
+}
+
+@keyframes Twinkle {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+@keyframes NebulaPulse {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.05); }
+}
+
+@keyframes PortalRing {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes FireSparkler {
+  0% {
+    transform: rotate(0deg);
+    box-shadow: 
+      0 0 12px 3px #ff7800,
+      0 0 20px 6px #ff4d00,
+      inset 0 0 8px 2px #ff4d00;
+  }
+  100% {
+    transform: rotate(360deg);
+    box-shadow: 
+      0 0 12px 3px #ff7800,
+      0 0 20px 6px #ff4d00,
+      inset 0 0 8px 2px #ff4d00;
+  }
+}
+
+@keyframes PortalSparks {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
