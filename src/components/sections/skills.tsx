@@ -121,7 +121,7 @@ const Skills = () => {
                       transform: 'translate(-50%, -50%) translate(var(--x-mobile), var(--y-mobile))',
                       left: `50%`,
                       top: `50%`,
-                    }}
+                    } as React.CSSProperties}
                   >
                     <Tooltip>
                       <TooltipTrigger asChild>
