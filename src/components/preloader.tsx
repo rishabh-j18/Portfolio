@@ -1,6 +1,29 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+
 const Preloader = ({ loading }: { loading: boolean }) => {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    setProgress(0); // Reset progress on mount/loading change
+    if (loading) {
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            return 100;
+          }
+          return prev + 1;
+        });
+      }, 100); // Slower interval for a smoother feel
+
+      return () => clearInterval(interval);
+    }
+  }, [loading]);
+
+
   return (
     <div className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background text-white transition-opacity duration-500 ${loading ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
       <div className="relative h-40 w-40">
@@ -24,6 +47,42 @@ const Preloader = ({ loading }: { loading: boolean }) => {
         </div>
       </div>
       <p className="mt-8 text-lg font-medium tracking-widest text-muted-foreground animate-pulse">LOADING...</p>
+        
+      <div className="w-80 mx-auto mb-6 mt-8">
+          <div className="relative h-2 bg-slate-800 rounded-full overflow-hidden border border-primary/30">
+            <motion.div
+              className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-primary to-accent"
+              style={{
+                width: `${progress}%`,
+                willChange: "width",
+              }}
+              animate={{
+                boxShadow: [
+                  "0 0 10px hsl(var(--primary))",
+                  "0 0 15px hsl(var(--accent))",
+                  "0 0 10px hsl(var(--primary))",
+                ],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Number.POSITIVE_INFINITY,
+                ease: "easeInOut",
+              }}
+            />
+          </div>
+
+          <motion.div
+            className="text-center mt-4 font-mono text-lg text-primary"
+            animate={{ opacity: [0.7, 1, 0.7] }}
+            transition={{
+              duration: 1.5,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "easeInOut",
+            }}
+          >
+            {progress}% COMPLETE
+          </motion.div>
+        </div>
     </div>
   );
 };
