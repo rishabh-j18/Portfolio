@@ -1,28 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-const Preloader = ({ loading }: { loading: boolean }) => {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    setProgress(0); // Reset progress on mount/loading change
-    if (loading) {
-      const interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            return 100;
-          }
-          return prev + 1;
-        });
-      }, 100); // Slower interval for a smoother feel
-
-      return () => clearInterval(interval);
-    }
-  }, [loading]);
-
+const Preloader = ({ loading, progress }: { loading: boolean, progress: number }) => {
 
   return (
     <div className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background text-white transition-opacity duration-500 ${loading ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
@@ -53,10 +33,10 @@ const Preloader = ({ loading }: { loading: boolean }) => {
             <motion.div
               className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-primary to-accent"
               style={{
-                width: `${progress}%`,
                 willChange: "width",
               }}
               animate={{
+                width: `${progress}%`,
                 boxShadow: [
                   "0 0 10px hsl(var(--primary))",
                   "0 0 15px hsl(var(--accent))",
@@ -64,9 +44,12 @@ const Preloader = ({ loading }: { loading: boolean }) => {
                 ],
               }}
               transition={{
-                duration: 2,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
+                width: { duration: 0.5, ease: "easeInOut" },
+                boxShadow: {
+                    duration: 2,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: "easeInOut",
+                }
               }}
             />
           </div>
@@ -80,7 +63,7 @@ const Preloader = ({ loading }: { loading: boolean }) => {
               ease: "easeInOut",
             }}
           >
-            {progress}% COMPLETE
+            {Math.round(progress)}% COMPLETE
           </motion.div>
         </div>
     </div>

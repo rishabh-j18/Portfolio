@@ -17,14 +17,18 @@ export default function Home() {
   const [minTimeElapsed, setMinTimeElapsed] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [preloaderFinished, setPreloaderFinished] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   useEffect(() => {
-    // Signal that content has mounted
+    // Signal that content has mounted and update progress
     setContentReady(true);
+    setLoadingProgress(50);
+
 
     // Set a minimum display time for the preloader
     const timer = setTimeout(() => {
       setMinTimeElapsed(true);
+      setLoadingProgress(100);
     }, 1500);
 
     return () => clearTimeout(timer);
@@ -44,7 +48,7 @@ export default function Home() {
 
   return (
     <>
-      {!preloaderFinished && <Preloader loading={!isFadingOut} />}
+      {!preloaderFinished && <Preloader loading={!isFadingOut} progress={loadingProgress} />}
       <div className={`relative min-h-screen flex-col bg-background ${isFadingOut ? 'opacity-100 transition-opacity duration-2000' : 'opacity-0'}`}>
         <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] bg-repeat opacity-20 pointer-events-none"></div>
         <Navbar />
