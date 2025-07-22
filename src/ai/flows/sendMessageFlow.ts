@@ -21,10 +21,10 @@ const sendMessageFlow = ai.defineFlow(
     outputSchema: SendMessageOutputSchema,
   },
   async (input) => {
-    // In a real application, you would add logic here to:
-    // 1. Send an email notification (e.g., using Nodemailer or a third-party service).
-    // 2. Save the message to a database (e.g., Firestore).
-    // 3. Call another AI flow to analyze the message sentiment, etc.
+    // This flow uses Nodemailer to send an email.
+    // It retrieves email configuration from environment variables.
+    // Ensure you have EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASS, etc.
+    // set up in your .env file for this to work.
     
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
@@ -59,7 +59,8 @@ const sendMessageFlow = ai.defineFlow(
     } catch (error) {
       console.error('Failed to send email:', error);
       // Even if email fails, we can still report success to the user.
-      // The error is logged on the server.
+      // The error is logged on the server. A more robust solution might
+      // return a different message or handle the error more gracefully.
       return {
         success: true, 
         message: 'Message received successfully!',
