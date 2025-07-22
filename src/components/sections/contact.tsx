@@ -12,8 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { Rocket, Loader2 } from "lucide-react";
-import { sendMessage } from '@/ai/flows/sendMessageFlow';
-import { SendMessageInputSchema } from '@/ai/schemas/sendMessageSchemas';
+
+// Define the schema inline as the original schema file is being removed.
+const SendMessageInputSchema = z.object({
+  name: z.string().min(1, 'Name is required.'),
+  email: z.string().email('Invalid email address.'),
+  message: z.string().min(1, 'Message is required.'),
+});
 
 type FormData = z.infer<typeof SendMessageInputSchema>;
 
@@ -33,7 +38,20 @@ const Contact = () => {
   async function onSubmit(data: FormData) {
     setIsSubmitting(true);
     try {
-      const result = await sendMessage(data);
+      const response = await fetch('/api/sendMessage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}`);
+      }
+      
+      const result = await response.json();
+
       if (result.success) {
         toast({
           title: "Message Sent!",
@@ -41,9 +59,10 @@ const Contact = () => {
         });
         form.reset();
       } else {
-        throw new Error(result.message);
+        throw new Error(result.message || 'An unknown error occurred.');
       }
     } catch (error) {
+      console.error("Submission error:", error);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",

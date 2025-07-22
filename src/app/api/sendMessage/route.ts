@@ -1,19 +1,31 @@
-'use server';
 /**
- * @fileOverview A flow for handling contact form submissions and sending an email notification.
- *
- * - sendMessage - A function that handles the contact form submission.
+ * @fileOverview API route for handling contact form submissions.
+ * This route uses Genkit to define a flow that sends an email notification
+ * using Nodemailer. It's structured to be deployed as a serverless function on Vercel.
  */
 
+import { NextRequest } from 'next/server';
+import { toApiHandler } from '@genkit-ai/next';
 import { ai } from '@/ai/genkit';
-import { SendMessageInputSchema, SendMessageOutputSchema, type SendMessageInput, type SendMessageOutput } from '@/ai/schemas/sendMessageSchemas';
+import { z } from 'zod';
 import nodemailer from 'nodemailer';
 
+// Define the input schema for the contact form data.
+export const SendMessageInputSchema = z.object({
+  name: z.string().describe('The name of the person sending the message.'),
+  email: z.string().email().describe('The email of the person sending the message.'),
+  message: z.string().describe('The message content.'),
+});
+export type SendMessageInput = z.infer<typeof SendMessageInputSchema>;
 
-export async function sendMessage(input: SendMessageInput): Promise<SendMessageOutput> {
-  return await sendMessageFlow(input);
-}
+// Define the output schema for the API response.
+export const SendMessageOutputSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
+export type SendMessageOutput = z.infer<typeof SendMessageOutputSchema>;
 
+// Define the Genkit flow for sending the message.
 const sendMessageFlow = ai.defineFlow(
   {
     name: 'sendMessageFlow',
@@ -58,13 +70,17 @@ const sendMessageFlow = ai.defineFlow(
       };
     } catch (error) {
       console.error('Failed to send email:', error);
-      // Even if email fails, we can still report success to the user.
-      // The error is logged on the server. A more robust solution might
-      // return a different message or handle the error more gracefully.
+      // If email fails, return a failure response.
+      // This provides clearer feedback to the frontend.
       return {
-        success: true, 
-        message: 'Message received successfully!',
+        success: false, 
+        message: 'Message received, but failed to send email notification.',
       };
     }
   }
 );
+
+// Expose the flow as a Vercel-compatible API handler.
+export const POST = toApiHandler(sendMessageFlow, {
+    input: async (req: NextRequest) => await req.json(),
+});
