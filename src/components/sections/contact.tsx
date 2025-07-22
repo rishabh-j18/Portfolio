@@ -13,7 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { Rocket, Loader2 } from "lucide-react";
 
-// Define the schema inline as the original schema file is being removed.
+// Define the schema inline for the contact form data.
 const SendMessageInputSchema = z.object({
   name: z.string().min(1, 'Name is required.'),
   email: z.string().email('Invalid email address.'),
@@ -46,27 +46,24 @@ const Contact = () => {
         body: JSON.stringify(data),
       });
 
-      if (!response.ok) {
-        throw new Error(`Server responded with ${response.status}`);
-      }
-      
       const result = await response.json();
 
-      if (result.success) {
-        toast({
-          title: "Message Sent!",
-          description: "Thanks for reaching out. I'll get back to you soon.",
-        });
-        form.reset();
-      } else {
+      if (!response.ok || !result.success) {
         throw new Error(result.message || 'An unknown error occurred.');
       }
-    } catch (error) {
+
+      toast({
+        title: "Message Sent!",
+        description: "Thanks for reaching out. I'll get back to you soon.",
+      });
+      form.reset();
+
+    } catch (error: any) {
       console.error("Submission error:", error);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
-        description: "There was a problem sending your message. Please try again later.",
+        description: error.message || "There was a problem sending your message. Please try again later.",
       });
     } finally {
       setIsSubmitting(false);

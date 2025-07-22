@@ -1,39 +1,32 @@
 /**
  * @fileOverview API route for handling contact form submissions.
- * This route uses Genkit to define a flow that sends an email notification
- * using Nodemailer. It's structured to be deployed as a serverless function on Vercel.
+ * This route uses Nodemailer directly within a standard Next.js API route
+ * to send an email notification.
  */
 
-import { NextRequest } from 'next/server';
-import { toApiHandler } from '@genkit-ai/next';
-import { ai } from '@/ai/genkit';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import nodemailer from 'nodemailer';
 
 // Define the input schema for the contact form data.
 export const SendMessageInputSchema = z.object({
-  name: z.string().describe('The name of the person sending the message.'),
-  email: z.string().email().describe('The email of the person sending the message.'),
-  message: z.string().describe('The message content.'),
+  name: z.string().min(1, 'Name is required.'),
+  email: z.string().email('Invalid email address.'),
+  message: z.string().min(1, 'Message is required.'),
 });
-export type SendMessageInput = z.infer<typeof SendMessageInputSchema>;
 
-// Define the output schema for the API response.
-export const SendMessageOutputSchema = z.object({
-  success: z.boolean(),
-  message: z.string(),
-});
-export type SendMessageOutput = z.infer<typeof SendMessageOutputSchema>;
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const parsedData = SendMessageInputSchema.safeParse(body);
 
-// Define the Genkit flow for sending the message.
-const sendMessageFlow = ai.defineFlow(
-  {
-    name: 'sendMessageFlow',
-    inputSchema: SendMessageInputSchema,
-    outputSchema: SendMessageOutputSchema,
-  },
-  async (input) => {
-    // This flow uses Nodemailer to send an email.
+    if (!parsedData.success) {
+      return NextResponse.json({ success: false, message: 'Invalid input.' }, { status: 400 });
+    }
+
+    const { name, email, message } = parsedData.data;
+
+    // This logic uses Nodemailer to send an email.
     // It retrieves email configuration from environment variables.
     // Ensure you have EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASS, etc.
     // set up in your .env file for this to work.
@@ -51,36 +44,33 @@ const sendMessageFlow = ai.defineFlow(
     const mailOptions = {
       from: process.env.EMAIL_FROM,
       to: process.env.EMAIL_TO,
-      subject: `New Message from ${input.name} via Portfolio`,
-      text: `Name: ${input.name}\nEmail: ${input.email}\n\nMessage:\n${input.message}`,
+      subject: `New Message from ${name} via Portfolio`,
+      text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
       html: `
-        <p><strong>Name:</strong> ${input.name}</p>
-        <p><strong>Email:</strong> <a href="mailto:${input.email}">${input.email}</a></p>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
         <hr>
         <p><strong>Message:</strong></p>
-        <p>${input.message.replace(/\n/g, '<br>')}</p>
+        <p>${message.replace(/\n/g, '<br>')}</p>
       `,
     };
 
-    try {
-      await transporter.sendMail(mailOptions);
-      return {
+    await transporter.sendMail(mailOptions);
+    
+    return NextResponse.json({
         success: true,
         message: 'Message received and notification sent!',
-      };
-    } catch (error) {
-      console.error('Failed to send email:', error);
-      // If email fails, return a failure response.
-      // This provides clearer feedback to the frontend.
-      return {
+    });
+
+  } catch (error) {
+    console.error('Failed to send email:', error);
+    // If email fails, return a failure response.
+    // This provides clearer feedback to the frontend.
+    return NextResponse.json({
         success: false, 
         message: 'Message received, but failed to send email notification.',
-      };
-    }
+      }, 
+      { status: 500 }
+    );
   }
-);
-
-// Expose the flow as a Vercel-compatible API handler.
-export const POST = toApiHandler(sendMessageFlow, {
-    input: async (req: NextRequest) => await req.json(),
-});
+}
