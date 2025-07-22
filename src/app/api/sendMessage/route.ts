@@ -8,14 +8,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import nodemailer from 'nodemailer';
 
-// Define the input schema for the contact form data.
-export const SendMessageInputSchema = z.object({
-  name: z.string().min(1, 'Name is required.'),
-  email: z.string().email('Invalid email address.'),
-  message: z.string().min(1, 'Message is required.'),
-});
-
 export async function POST(req: NextRequest) {
+  // Define the input schema for the contact form data inside the function.
+  const SendMessageInputSchema = z.object({
+    name: z.string().min(1, 'Name is required.'),
+    email: z.string().email('Invalid email address.'),
+    message: z.string().min(1, 'Message is required.'),
+  });
+
   try {
     const body = await req.json();
     const parsedData = SendMessageInputSchema.safeParse(body);
