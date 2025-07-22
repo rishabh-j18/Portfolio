@@ -81,7 +81,7 @@ const Navbar = () => {
                 <div className="flex flex-col h-full">
                   <Link href={homeLink} className="mb-8 flex items-center gap-2 text-xl font-bold font-headline">
                     <Sparkles className="h-6 w-6 text-accent" />
-                    <span>AstroSpaceFolio</span>
+                    {/* <span>AstroSpaceFolio</span> */}
                   </Link>
                   <nav className="flex flex-col gap-4">
                     {currentNavItems.map((item) => (
