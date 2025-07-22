@@ -13,42 +13,55 @@ import Footer from '@/components/layout/footer';
 import Preloader from '@/components/preloader';
 
 export default function Home() {
-  const [contentReady, setContentReady] = useState(false);
-  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
-  const [isFadingOut, setIsFadingOut] = useState(false);
-  const [preloaderFinished, setPreloaderFinished] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [visualProgress, setVisualProgress] = useState(0);
+  const [preloaderFinished, setPreloaderFinished] = useState(false);
+  const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
-    // Signal that content has mounted and update progress
-    setContentReady(true);
+    // Stage 1: Component has mounted
     setLoadingProgress(50);
 
-
-    // Set a minimum display time for the preloader
+    // Stage 2: Minimum preloader time elapsed
     const timer = setTimeout(() => {
-      setMinTimeElapsed(true);
       setLoadingProgress(100);
-    }, 1500);
+    }, 1500); 
 
     return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    if (contentReady && minTimeElapsed) {
-      setIsFadingOut(true);
+    let delayTimer: NodeJS.Timeout;
+    if (loadingProgress !== visualProgress) {
+      delayTimer = setTimeout(() => {
+        setVisualProgress(loadingProgress);
+      }, 500);
+    }
+    return () => clearTimeout(delayTimer);
+  }, [loadingProgress, visualProgress]);
 
-      const fadeOutTimer = setTimeout(() => {
+
+  useEffect(() => {
+    if (visualProgress === 100 && !isFadingOut) {
+      const startFadeOutTimer = setTimeout(() => {
+        setIsFadingOut(true);
+      }, 250); // Wait 250ms before starting fade out
+
+      const finishPreloaderTimer = setTimeout(() => {
         setPreloaderFinished(true);
       }, 2000); // Corresponds to the fade-out duration
 
-      return () => clearTimeout(fadeOutTimer);
+      return () => {
+        clearTimeout(startFadeOutTimer);
+        clearTimeout(finishPreloaderTimer);
+      };
     }
-  }, [contentReady, minTimeElapsed]);
+  }, [visualProgress, isFadingOut]);
+
 
   return (
     <>
-      {!preloaderFinished && <Preloader loading={!isFadingOut} progress={loadingProgress} />}
+      {!preloaderFinished && <Preloader loading={!isFadingOut} progress={visualProgress} />}
       <div className={`relative min-h-screen flex-col bg-background ${isFadingOut ? 'opacity-100 transition-opacity duration-2000' : 'opacity-0'}`}>
         <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] bg-repeat opacity-20 pointer-events-none"></div>
         <Navbar />
