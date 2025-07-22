@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     });
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM,
+      from: process.env.EMAIL_USER,
       to: process.env.EMAIL_TO,
       subject: `New Message from ${name} via Portfolio`,
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
