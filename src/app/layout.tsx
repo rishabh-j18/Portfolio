@@ -9,8 +9,8 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'AstroSpaceFolio',
-  description: 'A personal portfolio with a cosmic theme.',
+  title: 'Rishabh Jaiswal',
+  description: `Welcome! I'm Rishabh Jaiswal, a passionate Creative Developer & Digital Artist dedicated to crafting extraordinary digital experiences. With a robust background in Full-Stack MERN development and a keen interest in Web3 (Solidity & Blockchain), I specialize in building performant, scalable, and visually compelling web applications. My expertise spans responsive UI/UX implementation with React.js & Tailwind CSS, optimizing performance with frameworks like Astro, and architecting robust backend solutions. Beyond coding, I leverage my artistic flair to ensure every project is not just functional, but also beautiful. My commitment to automated testing, problem-solving, and team leadership ensures delivery of high-quality, impactful solutions.`,
 };
 
 export default function RootLayout({
