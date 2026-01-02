@@ -1,7 +1,7 @@
 // src/components/cosmic-scene.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 type StarStyle = {
   animation: string;
@@ -11,6 +11,23 @@ type StarStyle = {
 
 const CosmicScene = () => {
   const [starStyles, setStarStyles] = useState<StarStyle[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     // Generate star styles only on the client-side to avoid hydration mismatch
@@ -20,16 +37,19 @@ const CosmicScene = () => {
       filter: 'blur(1px)',
     }));
     setStarStyles(styles);
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, []);
+
+  if (!isVisible) return <div ref={containerRef} className="absolute inset-0 z-0 h-full w-full" />;
 
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden">
+    <div ref={containerRef} className="absolute inset-0 z-0 overflow-hidden">
       {/* Static but softly pulsing nebula clouds using performant radial gradients */}
       <div
         className="absolute top-[-20%] left-[-20%] w-[80vw] h-[80vh] rounded-full animate-[NebulaPulse_20s_ease-in-out_infinite]"
         style={{
           background: 'radial-gradient(circle, rgba(109, 40, 217, 0.4) 0%, rgba(109, 40, 217, 0) 70%)',
           animationDelay: '0s',
+          willChange: 'transform, opacity',
         }}
       />
       <div
@@ -37,6 +57,7 @@ const CosmicScene = () => {
         style={{
           background: 'radial-gradient(circle, rgba(30, 58, 138, 0.5) 0%, rgba(30, 58, 138, 0) 70%)',
           animationDelay: '-5s',
+          willChange: 'transform, opacity',
         }}
       />
       <div
@@ -44,6 +65,7 @@ const CosmicScene = () => {
         style={{
           background: 'radial-gradient(circle, rgba(190, 24, 93, 0.3) 0%, rgba(190, 24, 93, 0) 70%)',
           animationDelay: '-10s',
+          willChange: 'transform, opacity',
         }}
       />
 
