@@ -90,7 +90,7 @@ export default function Home() {
         <main className="flex-grow">
           <Hero />
           {/* Only render these sections if the preloader is finishing to prioritize Hero load */}
-          {preloaderFinished && (
+          {isFadingOut && (
             <>
               <About />
               <Skills />
