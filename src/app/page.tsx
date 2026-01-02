@@ -1,16 +1,38 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Navbar from '@/components/layout/navbar';
 import Hero from '@/components/sections/hero';
-import About from '@/components/sections/about';
-import Skills from '@/components/sections/skills';
-import Projects from '@/components/sections/projects';
-import Education from '@/components/sections/education';
-import Certifications from '@/components/sections/certifications';
-import Contact from '@/components/sections/contact';
 import Footer from '@/components/layout/footer';
 import Preloader from '@/components/preloader';
+import LoadingSection from '@/components/loading-section';
+
+// Lazy load heavy sections
+const About = dynamic(() => import('@/components/sections/about'), {
+  loading: () => <LoadingSection />,
+  ssr: false
+});
+const Skills = dynamic(() => import('@/components/sections/skills'), {
+  loading: () => <LoadingSection />,
+  ssr: false
+});
+const Projects = dynamic(() => import('@/components/sections/projects'), {
+  loading: () => <LoadingSection />,
+  ssr: false
+});
+const Education = dynamic(() => import('@/components/sections/education'), {
+  loading: () => <LoadingSection />,
+  ssr: false
+});
+const Certifications = dynamic(() => import('@/components/sections/certifications'), {
+  loading: () => <LoadingSection />,
+  ssr: false
+});
+const Contact = dynamic(() => import('@/components/sections/contact'), {
+  loading: () => <LoadingSection />,
+  ssr: false
+});
 
 export default function Home() {
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -67,12 +89,17 @@ export default function Home() {
         <Navbar />
         <main className="flex-grow">
           <Hero />
-          <About />
-          <Skills />
-          <Projects />
-          <Education />
-          <Certifications />
-          <Contact />
+          {/* Only render these sections if the preloader is finishing to prioritize Hero load */}
+          {preloaderFinished && (
+            <>
+              <About />
+              <Skills />
+              <Projects />
+              <Education />
+              <Certifications />
+              <Contact />
+            </>
+          )}
         </main>
         <Footer />
       </div>

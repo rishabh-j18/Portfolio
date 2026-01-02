@@ -1,12 +1,32 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const Starfield = () => {
   const [stars, setStars] = useState<{ x: number; y: number; size: number; delay: number, duration: number }[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const generateStars = () => {
+      // Reduce star count for mobile/performance if needed, but keeping 100 for now as requested by user ("exciting UI")
+      // However, we can optimize by ensuring they only render when visible (handled by parent logic or just pure CSS is fine usually,
+      // but detaching them from DOM when not visible is better for low-end devices).
       const newStars = Array.from({ length: 100 }, () => ({
         x: Math.random() * 100, // percentage
         y: Math.random() * 100, // percentage
@@ -20,8 +40,10 @@ const Starfield = () => {
     generateStars();
   }, []);
 
+  if (!isVisible) return <div ref={containerRef} className="absolute inset-0 z-0" />;
+
   return (
-    <div className="absolute inset-0 z-0">
+    <div ref={containerRef} className="absolute inset-0 z-0">
       {stars.map((star, i) => (
         <div
           key={`star-${i}`}
@@ -33,6 +55,7 @@ const Starfield = () => {
             height: `${star.size}px`,
             animation: `Twinkle ${star.duration}s ease-in-out infinite`,
             animationDelay: `${star.delay}s`,
+            willChange: 'opacity', // Hint browser for optimization
           }}
         />
       ))}
